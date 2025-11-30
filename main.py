@@ -31,9 +31,9 @@ bot = Client(
 async def cancel_command(bot: Client, m: Message):
     user_id = m.from_user.id if m.from_user is not None else None
     if user_id not in auth_users and user_id not in sudo_users:
-        await m.reply(f"You Are Not Subscribed To This Bot\nContact - @Mahagoraxyz", quote=True)
+        await m.reply(f"**You Are Not Subscribed To This Bot\nContact - @Mahagoraxyz**", quote=True)
         return
-    await m.reply_text("STOPPED🛑🛑", True)
+    await m.reply_text("**STOPPED**🛑🛑", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 @bot.on_message(filters.command(["start"]))
@@ -42,10 +42,10 @@ async def account_login(bot: Client, m: Message):
     user_id = m.from_user.id if m.from_user is not None else None
 
     if user_id not in auth_users and user_id not in sudo_users:
-        await m.reply(f"You Are Not Subscribed To This Bot\nContact - @Mahagoraxyz", quote=True)
+        await m.reply(f"**You Are Not Subscribed To This Bot\nContact - @Mahagoraxyz**", quote=True)
         return
         
-    editable = await m.reply_text(f"Hey [{m.from_user.first_name}](tg://user?id={m.from_user.id})\nSend txt file")
+    editable = await m.reply_text(f"**Hey [{m.from_user.first_name}](tg://user?id={m.from_user.id})\nSend txt file**")
     input: Message = await bot.listen(editable.chat.id)
     if input.document:
         x = await input.download()
@@ -74,12 +74,12 @@ async def account_login(bot: Client, m: Message):
         for i in content:
             links.append(i.split("://", 1))
    
-    await editable.edit(f"Total links found are {len(links)}\n\nSend From where you want to download initial is 1")
+    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download initial is **1**")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
 
-    await editable.edit("Enter Batch Name or send d for grabing from text filename.")
+    await editable.edit("**Enter Batch Name or send d for grabing from text filename.**")
     input1: Message = await bot.listen(editable.chat.id)
     raw_text0 = input1.text
     await input1.delete(True)
@@ -88,7 +88,7 @@ async def account_login(bot: Client, m: Message):
     else:
         b_name = raw_text0
 
-    await editable.edit("Enter resolution")
+    await editable.edit("**Enter resolution**")
     input2: Message = await bot.listen(editable.chat.id)
     raw_text2 = input2.text
     await input2.delete(True)
@@ -110,7 +110,7 @@ async def account_login(bot: Client, m: Message):
     except Exception:
             res = "UN"
     
-    await editable.edit("**Enter Your Name or send de for use default**")
+    await editable.edit("**Enter Your Name or send `de` for use default**")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
@@ -118,12 +118,13 @@ async def account_login(bot: Client, m: Message):
         CR = credit
     else:
         CR = raw_text3
-await editable.edit("Enter Your PW/Classplus Woking Token\n\nOtherwise Send No")
+
+    await editable.edit("**Enter Your PW/Classplus Woking Token\n\nOtherwise Send No**")
     input4: Message = await bot.listen(editable.chat.id)
     working_token = input4.text
     await input4.delete(True)
 
-    await editable.edit("Now send the Thumb url\nEg : `https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send No`")
+    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send No`")
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
     await input6.delete(True)
@@ -156,7 +157,7 @@ await editable.edit("Enter Your PW/Classplus Woking Token\n\nOtherwise Send No")
             elif 'classplusapp' in url or "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
                 headers = {
                     'host': 'api.classplusapp.com',
-                    'x-access-token': f'{working_token}',    
+                    'x-access-token': f'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYzNTU1MzA0LCJvcmdJZCI6MTAwNTg1OSwidHlwZSI6MSwibW9iaWxlIjoiOTE3NTY4Mjg3NjM5IiwibmFtZSI6Ik1hbmlzaCIsImVtYWlsIjoibTc1NjgyODc2MzlAZ21haWwuY29tIiwiaXNJbnRlcm5hdGlvbmFsIjowLCJkZWZhdWx0TGFuZ3VhZ2UiOiJFTiIsImNvdW50cnlDb2RlIjoiSU4iLCJjb3VudHJ5SVNPIjoiOTEiLCJ0aW1lem9uZSI6IkdNVCs1OjMwIiwiaXNEaXkiOnRydWUsIm9yZ0NvZGUiOiJidWlqamsiLCJpc0RpeVN1YmFkbWluIjowLCJmaW5nZXJwcmludElkIjoiMjcyNWE0MDgxYWQ3NDA4MWIxZDJkZjc4NGRhNjJiYTMiLCJpYXQiOjE3NjQ0OTYxNzEsImV4cCI6MTc2NTEwMDk3MX0.oyJxarFpGY3WxUBDU_7cNmU_XZOmfcQOg9vMyvWkofMFQJ_BOndv5Q1gXWcEom_r',    
                     'accept-language': 'EN',
                     'api-version': '18',
                     'app-version': '1.4.73.2',
@@ -191,7 +192,8 @@ await editable.edit("Enter Your PW/Classplus Woking Token\n\nOtherwise Send No")
                 except Exception as e:
                     await m.reply_text(f"❌ CP API Failed: {e}")
                     continue
-elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+
+            elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                 url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={working_token}"
                 
             else:
@@ -201,8 +203,8 @@ elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
             name = f'{str(count).zfill(3)}) {name1[:60]}'
             
             try:                               
-                cc = f' {str(count).zfill(3)}. {name1}\nBatch Name : {b_name}\n\nDownloaded by : {CR}'
-                cc1 = f' {str(count).zfill(3)}. {name1}\nBatch Name :{b_name}\n\nDownloaded by : {CR}'
+                cc = f'** {str(count).zfill(3)}.** {name1}\n**Batch Name :** {b_name}\n\n**Downloaded by : {CR}**'
+                cc1 = f'** {str(count).zfill(3)}.** {name1}\n**Batch Name :**{b_name}\n\n**Downloaded by : {CR}**'
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
@@ -228,7 +230,7 @@ elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                         time.sleep(e.x)
                         continue
                 else:
-                    prog = await m.reply_text(f"Downloading:-\n\n Video Name :- {name}\nQuality - {raw_text2}\nlink:{url}**")
+                    prog = await m.reply_text(f"**Downloading:-**\n\n** Video Name :-** `{name}\nQuality - {raw_text2}`\n**link:**`{url}`**")
                     res_file = await helper.download_video(url, name, raw_text2)
                     filename = res_file
                     await prog.delete(True)
@@ -236,7 +238,7 @@ elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                     count += 1
 
             except Exception as e:
-                await m.reply_text(f"This #Failed File is not Counted\nName =>> {name}\nLink =>> {url}\n\n  fail reason » {e}")
+                await m.reply_text(f"**This #Failed File is not Counted**\n**Name** =>> `{name}`\n**Link** =>> `{url}`\n\n ** fail reason »** {e}")
                 count += 1
                 continue
 
