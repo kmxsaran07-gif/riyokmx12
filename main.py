@@ -31,7 +31,7 @@ bot = Client(
 async def cancel_command(bot: Client, m: Message):
     user_id = m.from_user.id if m.from_user is not None else None
     if user_id not in auth_users and user_id not in sudo_users:
-        await m.reply(f"**You Are Not Subscribed To This Bot\nContact - @Mahagoraxyz**", quote=True)
+        await m.reply(f"**You Are Not Subscribed To This Bot\nContact - @Kmxretro**", quote=True)
         return
     await m.reply_text("**STOPPED**🛑🛑", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
