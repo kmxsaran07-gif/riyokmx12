@@ -178,13 +178,20 @@ async def account_login(bot: Client, m: Message):
                     "url": f"{url}"
                 }
 
-                res = requests.get("https://api.classplusapp.com/cams/uploader/video/jw-signed-url", params=params, headers=headers).json()
-                
-                if "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
-                    url = res['drmUrls']['manifestUrl']
-                    
-                else:
-                    url = res["url"]
+               try:
+    res = requests.get("https://api.classplusapp.com/cams/uploader/video/jw-signed-url", params=params, headers=headers).json()
+    
+    if "url" in res:
+        if "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
+            url = res['drmUrls']['manifestUrl']
+        else:
+            url = res["url"]
+    else:
+        await m.reply_text(f"❌ CP API Error: {res}")
+        continue
+except Exception as e:
+    await m.reply_text(f"❌ CP API Failed: {e}")
+    continue
 
             elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                 url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={working_token}"
