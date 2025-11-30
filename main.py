@@ -119,12 +119,12 @@ async def account_login(bot: Client, m: Message):
     else:
         CR = raw_text3
 
-    await editable.edit("**Enter Your PW/Classplus Woking Token\n\nOtherwise Send No**")
+    await editable.edit("**Enter Your PW/Classplus Woking Token\n\nOtherwise Send 'no'**")
     input4: Message = await bot.listen(editable.chat.id)
     working_token = input4.text
     await input4.delete(True)
 
-    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send No`")
+    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send 'no'")
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
     await input6.delete(True)
@@ -135,7 +135,7 @@ async def account_login(bot: Client, m: Message):
         getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")
         thumb = "thumb.jpg"
     else:
-        thumb == "No"
+        thumb == "no"
 
     if len(links) == 1:
         count = 1
@@ -165,10 +165,26 @@ async def account_login(bot: Client, m: Message):
                             continue
 
             elif 'classplusapp' in url or "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
-                # ✅ FIX 2: Check if token is valid
-                if working_token.lower() == "no" or not working_token:
-                    await m.reply_text("❌ Classplus token required but not provided")
-                    continue
+                # ✅ FIX 2: Skip if token is invalid
+                if working_token.lower() == "no" or not working_token or "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9" in working_token:
+                    await m.reply_text("🚫 Classplus token invalid, trying direct download...")
+                    # Direct download try karo
+                    try:
+                        name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+                        name = f'{str(count).zfill(3)}) {name1[:60]}'
+                        cc1 = f'** {str(count).zfill(3)}.** {name1}\n**Batch Name :**{b_name}\n\n**Downloaded by : {CR}**'
+                        
+                        prog = await m.reply_text(f"**Downloading Direct:-**\n\n**Name :-** `{name}`\n**link:**`{url}`")
+                        res_file = await helper.download_video(url, name, raw_text2)
+                        filename = res_file
+                        await prog.delete(True)
+                        await helper.send_vid(bot, m, cc1, filename, thumb, name)
+                        count += 1
+                        continue
+                    except Exception as e:
+                        await m.reply_text(f"❌ Direct download failed: {e}")
+                        count += 1
+                        continue
                     
                 headers = {
                     'host': 'api.classplusapp.com',
