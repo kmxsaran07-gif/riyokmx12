@@ -152,7 +152,12 @@ async def account_login(bot: Client, m: Message):
                 async with ClientSession() as session:
                     async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
                         text = await resp.text()
-                        url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
+                        url_match = re.search(r"(https://.*?playlist.m3u8.*?)\"", text)
+                        if url_match:
+                            url = url_match.group(1)
+                        else:
+                            await m.reply_text("❌ Visionias URL not found")
+                            continue
 
             elif 'classplusapp' in url or "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
                 headers = {
@@ -178,13 +183,24 @@ async def account_login(bot: Client, m: Message):
                     "url": f"{url}"
                 }
 
-                res = requests.get("https://api.classplusapp.com/cams/uploader/video/jw-signed-url", params=params, headers=headers).json()
-                
-                if "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
-                    url = res['drmUrls']['manifestUrl']
-                    
-                else:
-                    url = res["url"]
+                try:
+                    res = requests.get("https://api.classplusapp.com/cams/uploader/video/jw-signed-url", params=params, headers=headers)
+                    if res.status_code == 200:
+                        res_json = res.json()
+                        if "url" in res_json:
+                            if "testbook.com" in url or "classplusapp.com/drm" in url or "media-cdn.classplusapp.com/drm" in url:
+                                url = res_json['drmUrls']['manifestUrl']
+                            else:
+                                url = res_json["url"]
+                        else:
+                            await m.reply_text(f"❌ CP API Error: {res_json}")
+                            continue
+                    else:
+                        await m.reply_text(f"❌ CP API Failed: {res.status_code}")
+                        continue
+                except Exception as e:
+                    await m.reply_text(f"❌ CP API Exception: {e}")
+                    continue
 
             elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                 url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={working_token}"
@@ -217,6 +233,7 @@ async def account_login(bot: Client, m: Message):
                         copy = await bot.send_document(chat_id=m.chat.id,document=f'{name}.pdf', caption=cc1)
                         count += 1
                         os.remove(f'{name}.pdf')
+                        continue
                     except FloodWait as e:
                         await m.reply_text(str(e))
                         time.sleep(e.x)
@@ -224,7 +241,13 @@ async def account_login(bot: Client, m: Message):
                 else:
                     prog = await m.reply_text(f"**Downloading:-**\n\n** Video Name :-** `{name}\nQuality - {raw_text2}`\n**link:**`{url}`**")
                     res_file = await helper.download_video(url, name, raw_text2)
-                    filename = res_file
+                    
+                    # ✅ FIX: Handle tuple return
+                    if isinstance(res_file, tuple):
+                        filename = res_file[0]  # Pehla element lo
+                    else:
+                        filename = res_file
+                        
                     await prog.delete(True)
                     await helper.send_vid(bot, m, cc, filename, thumb, name)
                     count += 1
@@ -235,7 +258,7 @@ async def account_login(bot: Client, m: Message):
                 continue
 
     except Exception as e:
-        await m.reply_text(e)
+        await m.reply_text(f"Main Error: {e}")
     await m.reply_text("🔰Done Boss🔰")
 
 
