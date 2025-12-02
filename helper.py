@@ -5,6 +5,7 @@ import asyncio
 import os
 import requests
 import time
+import json  # ✅ ADD THIS LINE
 from p_bar import progress_bar
 import aiohttp
 import tgcrypto
@@ -13,29 +14,28 @@ from pyrogram.types import Message
 from pyrogram import Client, filters
 
 async def generate_thumbnail(filename, width=1280, height=720, time="0.0"):
-  try:
+    try:
+        if os.path.exists(f"{filename}.jpg"):
+            os.remove(f"{filename}.jpg")
 
-    if os.path.exists(f"{filename}.jpg"):
-        os.remove(f"{filename}.jpg")
-
-    subprocess.run(
-      [
-        "ffmpeg",
-        "-ss",
-        time,
-        "-i",
-        filename,
-        "-vframes",
-        "1",
-        "-s",
-        f"{width}x{height}",
-        f"{filename}.jpg",
-      ],
-      check=True,
-    )
-    return f"{filename}.jpg"
-  except subprocess.CalledProcessError as e:
-    return None
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-ss",
+                time,
+                "-i",
+                filename,
+                "-vframes",
+                "1",
+                "-s",
+                f"{width}x{height}",
+                f"{filename}.jpg",
+            ],
+            check=True,
+        )
+        return f"{filename}.jpg"
+    except subprocess.CalledProcessError as e:
+        return None
 
 def get_video_duration(filename, max_attempts=3):
     for attempt in range(max_attempts):
@@ -67,7 +67,6 @@ def get_video_duration(filename, max_attempts=3):
     print(f"Failed to get duration after {max_attempts} attempts. Returning 0")
     return 0
 
-
 async def download(url, name):
     ka = f'{name}.pdf'
     async with aiohttp.ClientSession() as session:
@@ -92,7 +91,6 @@ async def run(cmd):
     if stderr:
         return f'[stderr]\n{stderr.decode()}'
 
-
 def old_download(url, file_name, chunk_size=1024 * 10):
     if os.path.exists(file_name):
         os.remove(file_name)
@@ -103,7 +101,6 @@ def old_download(url, file_name, chunk_size=1024 * 10):
                 fd.write(chunk)
     return file_name
 
-
 def human_readable_size(size, decimal_places=2):
     for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
         if size < 1024.0 or unit == 'PB':
@@ -111,32 +108,30 @@ def human_readable_size(size, decimal_places=2):
         size /= 1024.0
     return f"{size:.{decimal_places}f} {unit}"
 
-
 def time_name():
     date = datetime.date.today()
     now = datetime.datetime.now()
     current_time = now.strftime("%H%M%S")
     return f"{date} {current_time}.mp4"
 
-
 async def download_video(url, name, raw_text2):
     try:
         output_file = f"{name}.mp4"
         
         command = [
-                "yt-dlp",
-                "-k", 
-                "--allow-unplayable-formats", 
-                "--geo-bypass",
-                "--cookies", "cookies.txt",
-                "-f", "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b",
-                "-S", f"res~{raw_text2},+size,+br",
-                "--fixup", "never",
-                url,
-                "--external-downloader", "aria2c",
-                "--external-downloader-args", "-x 16 -s 16 -k 1M", 
-                "--output", output_file,
-                "--merge-output-format", "mp4",
+            "yt-dlp",
+            "-k", 
+            "--allow-unplayable-formats",
+"--geo-bypass",
+            "--cookies", "cookies.txt",
+            "-f", "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b",
+            "-S", f"res~{raw_text2},+size,+br",
+            "--fixup", "never",
+            url,
+            "--external-downloader", "aria2c",
+            "--external-downloader-args", "-x 16 -s 16 -k 1M", 
+            "--output", output_file,
+            "--merge-output-format", "mp4",
         ]
             
         result = subprocess.run(command, check=True, text=True, stderr=subprocess.PIPE)
@@ -145,25 +140,26 @@ async def download_video(url, name, raw_text2):
             print(f"Successfully downloaded: {output_file}")
                                 
             if os.path.isfile(output_file):
-                return output_file
+                return output_file  # ✅ SIRF FILE PATH RETURN KARO
+            else:
+                return None
 
         else:
             print(f"yt-dlp command failed: {result.stderr.strip()}")
-            return None, f"yt-dlp command failed: {result.stderr.strip()}"
+            return None  # ✅ SIRF NONE RETURN KARO
 
     except FileNotFoundError as exc:
         print(f"File not found: {exc}")
-        return None, f"File not found: {exc}"
+        return None  # ✅ SIRF NONE RETURN KARO
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e.stderr.strip()}")
-        return None, f"An error occurred: {e.stderr.strip()}"
+        return None  # ✅ SIRF NONE RETURN KARO
         
 async def send_vid(bot: Client, m: Message, cc, filename, thumb, name):
-
     generated_thumb = None
     generated_thumb = await generate_thumbnail(filename)
     
-    reply = await m.reply_text(f"**UPLOADING » {name}**")
+    reply = await m.reply_text(f"UPLOADING » {name}")
 
     thumbnail = thumb if thumb and thumb != "No" else generated_thumb
 
@@ -175,9 +171,11 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name):
         await m.reply_video(filename, caption=cc, supports_streaming=True, height=720, width=1280, thumb=thumbnail, duration=duration, progress=progress_bar, progress_args=(reply, start_time))
                 
     except Exception as e:
-        await print(str(e))
+        print(str(e))  # ✅ FIX: await hatao
                 
-    os.remove(filename)
-    os.remove(thumbnail)
+    if os.path.exists(filename):
+        os.remove(filename)
+    if thumbnail and os.path.exists(thumbnail):
+        os.remove(thumbnail)
     
     await reply.delete(True)
