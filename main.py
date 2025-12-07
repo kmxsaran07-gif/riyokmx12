@@ -177,7 +177,7 @@ async def account_login(bot: Client, m: Message):
                     'accept-encoding': 'gzip'
                 }
                 
-                url = url.replace('https://tencdn.classplusapp.com/', 'https://media-cdn.classplusapp.com/tencent/')
+                url = url.replace('https://itsgolu-cp-api.vercel.app/')
 
                 params = {
                     "url": f"{url}"
